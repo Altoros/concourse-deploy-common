@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -ex
+
+if [ "$(uname)" == "Darwin" ]; then
+    project_dir=$(greadlink -f "$(dirname $0)/../..")
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    project_dir=$(readlink -f "$(dirname $0)/../..")
+else
+    echo "Error: Unknown platform - $(uname -a)"
+    exit 1
+fi
+
+source $project_dir/ci/utils/load-bosh-env.sh
+
+# if [[ -z $CONCOURSE_URI || -z $CONCOURSE_TARGET || -z $CONCOURSE_USER || -z $CONCOURSE_PASSWORD || \
+#       -z $VAULT_ADDR || -z $VAULT_TOKEN || \
+#       -z $GIT_PRIVATE_KEY_PATH || -z $CONFIG_REPO || -z $FOUNDATION_NAME ]]; then
+#   echo "one the following environment variables is not set: "
+#   echo ""
+#   echo "                 CONCOURSE_URI"
+#   echo "                 CONCOURSE_TARGET"
+#   echo "                 CONCOURSE_USER"
+#   echo "                 CONCOURSE_PASSWORD"
+#   echo "                 VAULT_ADDR"
+#   echo "                 VAULT_TOKEN"
+#   echo "                 CONFIG_REPO"
+#   echo "                 GIT_PRIVATE_KEY_PATH"
+#   echo "                 FOUNDATION_NAME"
+#   echo ""
+#   exit 1
+# fi
+
+# PRODUCT_NAME=p-redis
+
+echo "Updating $FOUNDATION_NAME management pipeline on $CONCOURSE_TARGET concourse."
+
+fly -t $CONCOURSE_TARGET login -c $CONCOURSE_URI -u $CONCOURSE_USER -p $CONCOURSE_PASSWORD
+
+fly -t $CONCOURSE_TARGET set-pipeline -p $PRODUCT_NAME-$FOUNDATION_NAME \
+              --config="$project_dir/ci/pipeline.yml" \
+              --var="vault-address=$VAULT_ADDR" \
+              --var="vault-token=$VAULT_TOKEN" \
+              --var="foundation-name=$FOUNDATION_NAME" \
+              --var="deployment-name=$PRODUCT_NAME-$FOUNDATION_NAME" \
+              --var="pipeline-repo=$PIPELINE_REPO" \
+              --var="pipeline-repo-brunch=master" \
+              --var="product-name=$PRODUCT_NAME"
+              # --var="pivotal-network-api-token=$PIVOTAL_NETWORK_API_TOKEN" \
+              # --var="product-name=pivotal-redis-service" \
+              # --var="product-slug=p-redis" \
+              # --var="omg-product-slug=redis-plugin-linux" \
+              # --var="pivotal-network-glob=p-redis-*" \
+              # --var="omg-product-bundle-glob=redis-plugin-linux" \
+              # --var="vault-props-path=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
+              # --var="product-plugin=redis-plugin-linux" \
+              # --var="bosh-vault-hash=secret/bosh-$FOUNDATION_NAME-props" \
+              # --var="password-vault-hash=secret/$PRODUCT_NAME-$FOUNDATION_NAME-password" \
+              # --var="props-vault-hash=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
+              # --var="vault-hash-ip=secret/$PRODUCT_NAME-$FOUNDATION_NAME-ips" \
+              # --var="vault-hash-hostvars=secret/$PRODUCT_NAME-$FOUNDATION_NAME-hostvars" \
+              # --var="vault-hash-props=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
+              # --var="vault-hash-passwords=secret/$PRODUCT_NAME-$FOUNDATION_NAME-passwords" \
+              # --var="vault-hash-list=secret/cf-$FOUNDATION_NAME-props,secret/cf-$FOUNDATION_NAME-password" \
+              # --var="props-vault-hash=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
+              # --var="cf-vault-hash=secret/cf-$FOUNDATION_NAME-props,secret/cf-$FOUNDATION_NAME-password" \
+
+              # --var="skip-haproxy=false" \
+              # --var="stemcell-cpi-glob='*vsphere*'" \
+              # --var="stemcell-version=3263.12"
+
+
+fly -t $CONCOURSE_TARGET unpause-pipeline -p $PRODUCT_NAME-$FOUNDATION_NAME
+
+echo "Done."
