@@ -10,25 +10,25 @@ else
     exit 1
 fi
 
-source $project_dir/ci/utils/load-bosh-env.sh
+# source $project_dir/ci/utils/load-bosh-env.sh
 
-# if [[ -z $CONCOURSE_URI || -z $CONCOURSE_TARGET || -z $CONCOURSE_USER || -z $CONCOURSE_PASSWORD || \
-#       -z $VAULT_ADDR || -z $VAULT_TOKEN || \
-#       -z $GIT_PRIVATE_KEY_PATH || -z $CONFIG_REPO || -z $FOUNDATION_NAME ]]; then
-#   echo "one the following environment variables is not set: "
-#   echo ""
-#   echo "                 CONCOURSE_URI"
-#   echo "                 CONCOURSE_TARGET"
-#   echo "                 CONCOURSE_USER"
-#   echo "                 CONCOURSE_PASSWORD"
-#   echo "                 VAULT_ADDR"
-#   echo "                 VAULT_TOKEN"
-#   echo "                 CONFIG_REPO"
-#   echo "                 GIT_PRIVATE_KEY_PATH"
-#   echo "                 FOUNDATION_NAME"
-#   echo ""
-#   exit 1
-# fi
+if [[ -z $CONCOURSE_URI || -z $CONCOURSE_TARGET || -z $CONCOURSE_USER || -z $CONCOURSE_PASSWORD || \
+      -z $VAULT_ADDR || -z $VAULT_TOKEN || \
+      -z $PIPELINE_REPO || -z $FOUNDATION_NAME || -z $PRODUCT_NAME ]]; then
+  echo "one the following environment variables is not set: "
+  echo ""
+  echo "                 CONCOURSE_URI"
+  echo "                 CONCOURSE_TARGET"
+  echo "                 CONCOURSE_USER"
+  echo "                 CONCOURSE_PASSWORD"
+  echo "                 VAULT_ADDR"
+  echo "                 VAULT_TOKEN"
+  echo "                 CONFIG_REPO"
+  echo "                 GIT_PRIVATE_KEY_PATH"
+  echo "                 FOUNDATION_NAME"
+  echo ""
+  exit 1
+fi
 
 # PRODUCT_NAME=p-redis
 
@@ -41,7 +41,6 @@ fly -t $CONCOURSE_TARGET set-pipeline -p $PRODUCT_NAME-$FOUNDATION_NAME \
               --var="vault-address=$VAULT_ADDR" \
               --var="vault-token=$VAULT_TOKEN" \
               --var="foundation-name=$FOUNDATION_NAME" \
-              --var="deployment-name=$PRODUCT_NAME-$FOUNDATION_NAME" \
               --var="pipeline-repo=$PIPELINE_REPO" \
               --var="pipeline-repo-brunch=master" \
               --var="product-name=$PRODUCT_NAME"
