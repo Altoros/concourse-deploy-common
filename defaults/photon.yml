@@ -1,0 +1,4 @@
+---
+skip-haproxy: false
+stemcell-cpi-glob: '*vsphere*'
+stemcell-version: 3263.12

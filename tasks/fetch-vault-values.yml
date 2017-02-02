@@ -1,0 +1,17 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: allomov/deploy-worker
+    tag: v1.0
+
+run:
+  path: pipeline-repo/ci/scripts/fetch-vault-values.sh
+
+inputs:
+- name: pipeline-repo
+
+outputs:
+- name: vault
