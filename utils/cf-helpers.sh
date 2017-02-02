@@ -50,7 +50,7 @@ function cf_create_service() {
 
 # Todo: think how this can be exatracted?
 function exit_on_error() {
-  $ERROR_MESSAGE=$1
+  ERROR_MESSAGE=$1
   if [ $? != 0 ];
   then
       echo $ERROR_MESSAGE
