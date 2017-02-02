@@ -2,9 +2,9 @@
 if [[ -z $CF_API_URL || -z $CF_ADMIN_USERNAME || -z $CF_ADMIN_PASSWORD ]]; then
   echo "ERROR: one of the following environment variables is not set: "
   echo ""
-  echo "                 VAULT_ADDR"
-  echo "                 VAULT_TOKEN"
-  echo "                 FOUNDATION_NAME"
+  echo "                 CF_API_URL"
+  echo "                 CF_ADMIN_USERNAME"
+  echo "                 CF_ADMIN_PASSWORD"
   echo ""
   exit 1
 fi

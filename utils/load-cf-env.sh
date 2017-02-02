@@ -16,7 +16,8 @@ fi
 export VAULT_HASH_CF_PROPS="secret/cf-$FOUNDATION_NAME-props"
 export VAULT_HASH_CF_PASSWORDS="secret/cf-$FOUNDATION_NAME-password"
 export CF_SYSTEM_DOMAIN=$(vault read -field=system-domain $VAULT_HASH_CF_PROPS)
-export CF_API_DOMAIN=https://api.$CF_SYSTEM_DOMAIN
+export CF_API_DOMAIN=api.$CF_SYSTEM_DOMAIN
+export CF_API_URL=https://$CF_API_DOMAIN
 export CF_APPS_DOMAIN=$(vault read -field=app-domain $VAULT_HASH_CF_PROPS)
 
 export CF_ADMIN_USERNAME=admin
@@ -30,6 +31,6 @@ export CF_NATS_PORT=4222
 export CF_NATS_USERNAME=nats
 export CF_NATS_PASSWORD=$(vault read -field=nats-pass $VAULT_HASH_CF_PASSWORDS)
 
-cf api $CF_API_DOMAIN --skip-ssl-validation
+cf api $CF_API_URL --skip-ssl-validation
 cf auth $CF_ADMIN_USERNAME $CF_ADMIN_PASSWORD
 cf target -o system -s system
