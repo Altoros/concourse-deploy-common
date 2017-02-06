@@ -57,3 +57,25 @@ function exit_on_error() {
       exit 1
   fi
 }
+
+function register_broker() {
+  [ -z "$1" ] && { echo "Environment variable PRODUCT_NAME must be set"; exit 1; }
+  [ -z "$2" ] && { echo "Environment variable BROKER_HOST must be set"; exit 2; }
+
+  broker=`cf service-brokers | grep $1 || true`
+  if [[ -z "$broker" ]]; then
+    cf create-service-broker $1 $2
+    exit_on_error "Error Creating Service."
+  else
+    cf update-service-broker $1 $2
+    exit_on_error "Error Creating Service."
+  fi
+}
+
+function enable_global_access() {
+  [ -z "$1" ] && { echo "Environment variable BROKER_PLAN_NAMES must be set"; exit 1; }
+
+  cf enable-service-access $plan_name
+  exit_on_error "Error Creating Service."
+}
+
