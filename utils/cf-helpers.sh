@@ -62,12 +62,11 @@ function register_broker() {
   
   PRODUCT_NAME=$1;
   BROKER_HOST=$2;
-  [ -z "$1" ] && { echo "Environment variable PRODUCT_NAME must be set"; exit 1; }
-  [ -z "$2" ] && { echo "Environment variable SECURITY_USER_NAME must be set"; exit 1; }
-  [ -z "$3" ] && { echo "Environment variable SECURITY_USER_PASSWORD must be set"; exit 1; }
-  [ -z "$4" ] && { echo "Environment variable BROKER_HOST must be set"; exit 2; }
+  [ -z "$1" ] && { echo "PRODUCT_NAME arg must be set"; exit 1; }
+  [ -z "$2" ] && { echo "SECURITY_USER_NAME arg must be set"; exit 1; }
+  [ -z "$3" ] && { echo "SECURITY_USER_PASSWORD arg must be set"; exit 1; }
+  [ -z "$4" ] && { echo "BROKER_HOST arg must be set"; exit 2; }
  
-  
   PRODUCT_NAME=$1;
   SECURITY_USER_NAME=$2;
   SECURITY_USER_PASSWORD=$3;
@@ -75,18 +74,21 @@ function register_broker() {
 
   broker=`cf service-brokers | grep $1 || true`
   if [[ -z "$broker" ]]; then
-    cf create-service-broker $1 $2
+    cf create-service-broker $1 $2 $3 $4
     exit_on_error "Error Creating Service."
   else
-    cf update-service-broker $1 $2
+    cf update-service-broker $1 $2 $3 $4
     exit_on_error "Error Creating Service."
   fi
 }
 
 function enable_global_access() {
-  [ -z "$1" ] && { echo "Environment variable BROKER_PLAN_NAMES must be set"; exit 1; }
 
+  [ -z "$1" ] && { echo "BROKER_PLAN_NAMES arg must be set"; exit 1; }
+
+  plan_name=$1;
   cf enable-service-access $plan_name
   exit_on_error "Error Creating Service."
+
 }
 
