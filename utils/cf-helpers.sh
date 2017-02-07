@@ -78,7 +78,7 @@ function register_broker() {
     exit_on_error "Error Creating Service."
   else
     cf update-service-broker $1 $2 $3 $4
-    exit_on_error "Error Creating Service."
+    exit_on_error "Error Updating Service."
   fi
 }
 
@@ -88,7 +88,7 @@ function enable_global_access() {
 
   plan_name=$1;
   cf enable-service-access $plan_name
-  exit_on_error "Error Creating Service."
+  exit_on_error "Error enabling serivce access."
 
 }
 
