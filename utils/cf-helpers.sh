@@ -59,8 +59,19 @@ function exit_on_error() {
 }
 
 function register_broker() {
+  
+  PRODUCT_NAME=$1;
+  BROKER_HOST=$2;
   [ -z "$1" ] && { echo "Environment variable PRODUCT_NAME must be set"; exit 1; }
-  [ -z "$2" ] && { echo "Environment variable BROKER_HOST must be set"; exit 2; }
+  [ -z "$2" ] && { echo "Environment variable SECURITY_USER_NAME must be set"; exit 1; }
+  [ -z "$3" ] && { echo "Environment variable SECURITY_USER_PASSWORD must be set"; exit 1; }
+  [ -z "$4" ] && { echo "Environment variable BROKER_HOST must be set"; exit 2; }
+ 
+  
+  PRODUCT_NAME=$1;
+  SECURITY_USER_NAME=$2;
+  SECURITY_USER_PASSWORD=$3;
+  BROKER_HOST=$4;
 
   broker=`cf service-brokers | grep $1 || true`
   if [[ -z "$broker" ]]; then
