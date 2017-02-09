@@ -31,7 +31,7 @@ export CF_NATS_PORT=4222
 export CF_NATS_USERNAME=nats
 export CF_NATS_PASSWORD=$(vault read -field=nats-pass $VAULT_HASH_CF_PASSWORDS)
 
-export CF_UAA_DOMAIN=api.$CF_SYSTEM_DOMAIN
+export CF_UAA_DOMAIN=uaa.$CF_SYSTEM_DOMAIN
 export CF_UAA_URL=https://$CF_UAA_DOMAIN
 export CF_UAA_ADMIN_CLIENT=admin
 export CF_UAA_ADMIN_CLIENT_SECRET=$(vault read -field=uaa-admin-secret $VAULT_HASH_CF_PASSWORDS)
