@@ -14,7 +14,8 @@ fi
 
 if [[ -z $CONCOURSE_URI || -z $CONCOURSE_TARGET || -z $CONCOURSE_USER || -z $CONCOURSE_PASSWORD || \
       -z $VAULT_ADDR || -z $VAULT_TOKEN || \
-      -z $PIPELINE_REPO || -z $FOUNDATION_NAME || -z $PRODUCT_NAME ]]; then
+      -z $PIPELINE_REPO || -z $PIPELINE_REPO_PRIVATE_KEY_PATH || \
+      -z $FOUNDATION_NAME || -z $PRODUCT_NAME ]]; then
   echo "one the following environment variables is not set: "
   echo ""
   echo "                 CONCOURSE_URI"
@@ -24,26 +25,13 @@ if [[ -z $CONCOURSE_URI || -z $CONCOURSE_TARGET || -z $CONCOURSE_USER || -z $CON
   echo "                 VAULT_ADDR"
   echo "                 VAULT_TOKEN"
   echo "                 CONFIG_REPO"
-  echo "                 GIT_PRIVATE_KEY_PATH"
+  echo "                 PIPELINE_REPO_PRIVATE_KEY_PATH"
   echo "                 FOUNDATION_NAME"
   echo ""
   exit 1
 fi
 
 PIPELINE_REPO_BRUNCH=${PIPELINE_REPO_BRANCH:-master}
-
-# PRODUCT_NAME=p-redis
-
-echo "Updating $FOUNDATION_NAME pipeline."
-
-if [[ -z "${PIPELINE_REPO_PRIVATE_KEY_PATH}" ]]; then
-  echo "Adding git private key."
-  bosh int \
-       --ops-file=$project_dir/common/operations/add-private-key.yml \
-       ci/pipeline.yml > $project_dir/common/resulting-pipeline.yml
-else
-  cp $project_dir/ci/pipeline.yml $project_dir/common/resulting-pipeline.yml
-fi
 
 echo "Updating $FOUNDATION_NAME management pipeline on $CONCOURSE_TARGET concourse."
 

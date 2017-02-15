@@ -1,5 +1,4 @@
 ---
 - type: replace
   path: /instance_groups/name=cc_bridge/vm_extensions?
-  value:
-  - "{{pipeline-repo-private-key}}"
+  value: "{{pipeline-repo-private-key}}"
