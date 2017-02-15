@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -e
+
+JOB_NAME=$1
+COMMAND="${2:-bash}"
+
+if [[ -z $CONCOURSE_URI || -z $CONCOURSE_TARGET || -z $CONCOURSE_USER || -z $CONCOURSE_PASSWORD || \
+      -z $FOUNDATION_NAME || -z $PRODUCT_NAME ]]; then
+  echo "one the following environment variables is not set: "
+  echo ""
+  echo "                 CONCOURSE_URI"
+  echo "                 CONCOURSE_TARGET"
+  echo "                 CONCOURSE_USER"
+  echo "                 CONCOURSE_PASSWORD"
+  echo "                 VAULT_ADDR"
+  echo "                 VAULT_TOKEN"
+  echo "                 CONFIG_REPO"
+  echo "                 PIPELINE_REPO_PRIVATE_KEY_PATH"
+  echo "                 FOUNDATION_NAME"
+  echo ""
+  exit 1
+fi
+
+fly -t $CONCOURSE_TARGET login -c $CONCOURSE_URI -u $CONCOURSE_USER -p $CONCOURSE_PASSWORD
+
+fly -t $CONCOURSE_TARGET hijack -j $PRODUCT_NAME-$FOUNDATION_NAME/$JOB_NAME $COMMAND

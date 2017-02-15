@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -ex
+
+if [ "$(uname)" == "Darwin" ]; then
+    project_dir=$(greadlink -f "$(dirname $0)/..")
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    project_dir=$(readlink -f "$(dirname $0)/..")
+else
+    echo "Error: Unknown platform - $(uname -a)"
+    exit 1
+fi
+
+if [[ -z $VAULT_ADDR || -z $VAULT_TOKEN || -z $FOUNDATION_NAME ]]; then
+  echo "one the following environment variables is not set: "
+  echo ""
+  echo "                 VAULT_ADDR"
+  echo "                 VAULT_TOKEN"
+  echo "                 FOUNDATION_NAME"
+  echo ""
+  exit 1
+fi
+
+vault write secret/$PRODUCT-$FOUNDATION_NAME-props @$project_dir/deployment-props.json
+
+echo "Updating $FOUNDATION_NAME management pipeline on $CONCOURSE_TARGET concourse."
