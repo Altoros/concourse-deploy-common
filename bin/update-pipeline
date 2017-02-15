@@ -30,42 +30,34 @@ if [[ -z $CONCOURSE_URI || -z $CONCOURSE_TARGET || -z $CONCOURSE_USER || -z $CON
   exit 1
 fi
 
+PIPELINE_REPO_BRUNCH=${PIPELINE_REPO_BRANCH:-master}
+
 # PRODUCT_NAME=p-redis
+
+echo "Updating $FOUNDATION_NAME pipeline."
+
+if [[ -z "${PIPELINE_REPO_PRIVATE_KEY_PATH}" ]]; then
+  echo "Adding git private key."
+  bosh int \
+       --ops-file=$project_dir/common/operations/add-private-key.yml \
+       ci/pipeline.yml > $project_dir/common/resulting-pipeline.yml
+else
+  cp $project_dir/ci/pipeline.yml $project_dir/common/resulting-pipeline.yml
+fi
 
 echo "Updating $FOUNDATION_NAME management pipeline on $CONCOURSE_TARGET concourse."
 
 fly -t $CONCOURSE_TARGET login -c $CONCOURSE_URI -u $CONCOURSE_USER -p $CONCOURSE_PASSWORD
 
 fly -t $CONCOURSE_TARGET set-pipeline -p $PRODUCT_NAME-$FOUNDATION_NAME \
-              --config="$project_dir/ci/pipeline.yml" \
+              --config="$project_dir/common/resulting-pipeline.yml" \
               --var="vault-address=$VAULT_ADDR" \
               --var="vault-token=$VAULT_TOKEN" \
               --var="foundation-name=$FOUNDATION_NAME" \
               --var="pipeline-repo=$PIPELINE_REPO" \
-              --var="pipeline-repo-brunch=master" \
+              --var="pipeline-repo-brunch=$PIPELINE_REPO_BRANCH" \
+              --var="pipeline-repo-private-key=$PIPELINE_REPO_PRIVATE_KEY_PATH" \
               --var="product-name=$PRODUCT_NAME"
-              # --var="pivotal-network-api-token=$PIVOTAL_NETWORK_API_TOKEN" \
-              # --var="product-name=pivotal-redis-service" \
-              # --var="product-slug=p-redis" \
-              # --var="omg-product-slug=redis-plugin-linux" \
-              # --var="pivotal-network-glob=p-redis-*" \
-              # --var="omg-product-bundle-glob=redis-plugin-linux" \
-              # --var="vault-props-path=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
-              # --var="product-plugin=redis-plugin-linux" \
-              # --var="bosh-vault-hash=secret/bosh-$FOUNDATION_NAME-props" \
-              # --var="password-vault-hash=secret/$PRODUCT_NAME-$FOUNDATION_NAME-password" \
-              # --var="props-vault-hash=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
-              # --var="vault-hash-ip=secret/$PRODUCT_NAME-$FOUNDATION_NAME-ips" \
-              # --var="vault-hash-hostvars=secret/$PRODUCT_NAME-$FOUNDATION_NAME-hostvars" \
-              # --var="vault-hash-props=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
-              # --var="vault-hash-passwords=secret/$PRODUCT_NAME-$FOUNDATION_NAME-passwords" \
-              # --var="vault-hash-list=secret/cf-$FOUNDATION_NAME-props,secret/cf-$FOUNDATION_NAME-password" \
-              # --var="props-vault-hash=secret/$PRODUCT_NAME-$FOUNDATION_NAME-props" \
-              # --var="cf-vault-hash=secret/cf-$FOUNDATION_NAME-props,secret/cf-$FOUNDATION_NAME-password" \
-
-              # --var="skip-haproxy=false" \
-              # --var="stemcell-cpi-glob='*vsphere*'" \
-              # --var="stemcell-version=3263.12"
 
 
 fly -t $CONCOURSE_TARGET unpause-pipeline -p $PRODUCT_NAME-$FOUNDATION_NAME

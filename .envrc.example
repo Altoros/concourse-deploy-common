@@ -1,0 +1,22 @@
+source_env ../..
+
+export PRODUCT_NAME=...
+export PIPELINE_REPO=...
+
+# Concourse Creds
+export CONCOURSE_URI=http://...:8080
+export CONCOURSE_TARGET=...
+export CONCOURSE_USER=...
+export CONCOURSE_PASSWORD=...
+
+# Vault Creds
+export VAULT_ADDR=http://...:8200
+export VAULT_TOKEN=...
+
+
+# Defaults
+export PIPELINE_REPO_BRANCH=master
+# does not impact if not set
+# export PIPELINE_REPO_PRIVATE_KEY_PATH=
+
+export PATH=$PATH:$PWD/common/bin
